@@ -13,21 +13,21 @@ import ARKit
 class ViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
+    var treenode = SCNNode()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Set the view's delegate
         sceneView.delegate = self
-        
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
+        let scene = SCNScene(named: "art.scnassets/model.scn")!
         
-        // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
         
-        // Set the scene to the view
-        sceneView.scene = scene
+    
+        self.sceneView.scene = scene
+       
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -45,6 +45,31 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Pause the view's session
         sceneView.session.pause()
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+      
+     
+        guard let touch = touches.first else {return}
+        let result = sceneView.hitTest(touch.location(in: sceneView), types: [.featurePoint])
+        guard let hitresult = result.last else {return}
+        let hitTransform = SCNMatrix4(hitresult.worldTransform)
+        let hitvector = SCNVector3Make(hitTransform.m41, hitTransform.m42, hitTransform.m43)
+        self.treenode.position = hitvector
+        
+        let casa = treenode.clone()
+        casa.position = hitvector
+        casa.scale = SCNVector3Make(0.001, 0.001, 0.001)
+        sceneView.scene.rootNode.addChildNode(casa)
+    
+       
+        
+    }
+    
+    func placeHouse(position: SCNVector3) {
+        
+        
+
     }
     
     override func didReceiveMemoryWarning() {
